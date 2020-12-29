@@ -1,6 +1,7 @@
 const express = require('express');
 const rp = require('request-promise');
 const bodyParser = require('body-parser');
+const _ = require('lodash');
 
 const app = express();
 const port = 3333;
@@ -21,31 +22,42 @@ var options = {
     json: true // Automatically parses the JSON string in the response
 };
 
-rp(options)
+app.get('/rates', (req, res, next) => {
+    rp(options)
     .then(function (repos) {
-        repos.forEach(item => {
-            rates.push(item)
-        });
-        app.get('/getRates', (req, res, next) => {
-            res.json(rates);
-        });
-
-        app.post('/', (req, res, next) => {
-            const body = req.body;
-            const {text} = req.body;
-            console.log(text)
-           
-            res.send(body)
-        });
+        return res.json(repos);
     })
     .catch(function (err) {
         // API call failed...
-        console.log('Error');
+        console.log('Error', err);
+        return res.status(500).send('Error')
     });
+});
 
+app.get('/rates/:code', (req, res, next) => {
+    const { code } = req.params;
 
+    rp(options)
+    .then(function (rates) {
+        const rateResult = _.find(rates, function (rate) {
+            return rate.cc === code;
+        })
+        return res.json(rateResult);
+    })
+    .catch(function (err) {
+        // API call failed...
+        console.log('Error', err);
+        return res.status(500).send('Error')
+    });
+});
 
-
+app.post('/', (req, res, next) => {
+    const body = req.body;
+    const {text} = req.body;
+    console.log(text)
+    
+    res.send(body)
+});
 
 
 app.listen(port, () => {
