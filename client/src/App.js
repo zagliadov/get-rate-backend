@@ -12,15 +12,16 @@ class App extends Component {
     this.fetchAllRates();
   }
   fetchAllRates() {
-    axios.get('/rate')
+    axios.get('/api/rates')
       .then(rates => {
         this.setState(rates)
       })
   }
 
   addNewRate(text) {
-    axios.post('/rates', { rate: 'USD' })
-      .then(data => console.log(data));
+    axios.post('/api/rates', { rate: 'USD' })
+      .then(data => console.log(data))
+      .catch(err => console.log);
   }
 
   render() {

@@ -7,9 +7,6 @@ const app = express();
 const port = 3333;
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended: true}));
-const rates = [
-
-];
 
 var options = {
     uri: 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=20200302&json',
@@ -22,7 +19,7 @@ var options = {
     json: true // Automatically parses the JSON string in the response
 };
 
-app.get('/rates', (req, res, next) => {
+app.get('/api/rates', (req, res, next) => {
     rp(options)
     .then(function (repos) {
         return res.json(repos);
@@ -34,7 +31,7 @@ app.get('/rates', (req, res, next) => {
     });
 });
 
-app.get('/rates/:code', (req, res, next) => {
+app.get('/api/rates/:code', (req, res, next) => {
     const { code } = req.params;
 
     rp(options)
@@ -51,14 +48,11 @@ app.get('/rates/:code', (req, res, next) => {
     });
 });
 
-app.post('/', (req, res, next) => {
-    const body = req.body;
-    const {text} = req.body;
-    console.log(text)
-    
-    res.send(body)
-});
-
+app.post('/api/rates', (req, res) => {
+    console.log(req.body); // тут будут данные из post
+    const { rate } = req.body; // а вот так можно получить красиво rate из объекта req.body
+    return res.sendStatus(200);
+})
 
 app.listen(port, () => {
     console.log('Server is running');
